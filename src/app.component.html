@@ -1,0 +1,68 @@
+<main class="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center">
+  <header class="text-center mb-10">
+    <h1 class="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-500">
+      Time-Travel Photo Booth
+    </h1>
+    <p class="text-slate-400 mt-2">Capture your face, choose a scene, and journey through time!</p>
+  </header>
+
+  <div class="w-full relative">
+    @if (isLoading()) {
+      <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="text-center">
+          <svg class="animate-spin h-12 w-12 text-cyan-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p class="text-xl font-medium mt-4 text-slate-200">{{ loadingMessage() }}</p>
+        </div>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="w-full max-w-2xl mx-auto p-4 mb-6 text-center text-red-300 bg-red-900/60 rounded-lg border border-red-700">
+        <p class="font-bold">A Temporal Anomaly Occurred!</p>
+        <p class="text-sm">{{ errorMessage() }}</p>
+      </div>
+    }
+    
+    @switch (view()) {
+      @case ('initial') {
+        <div class="text-center">
+          <button (click)="startCapture()" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 px-8 rounded-full text-lg transition-transform transform hover:scale-105 duration-300 shadow-lg hover:shadow-cyan-500/50">
+            Start Your Journey
+          </button>
+        </div>
+      }
+      @case ('capturing') {
+        <app-camera (photoCaptured)="onPhotoCaptured($event)"></app-camera>
+      }
+      @case ('captured') {
+        <div class="w-full max-w-lg mx-auto p-4 text-center bg-slate-800 rounded-xl shadow-2xl border border-slate-700">
+          <h2 class="text-2xl font-bold mb-4">Is this a good likeness?</h2>
+          <img [src]="'data:image/jpeg;base64,' + userPhoto()" alt="User capture" class="rounded-lg mb-6 w-full aspect-square object-cover">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <button (click)="retakePhoto()" class="flex-1 bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">
+              Retake Photo
+            </button>
+            <button (click)="usePhoto()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">
+              Use This Photo
+            </button>
+          </div>
+        </div>
+      }
+      @case ('selecting') {
+        <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold">Choose Your Destination</h2>
+            <p class="text-slate-400">Select a historical scene to travel to.</p>
+        </div>
+        <app-scene-selector [scenes]="scenes" (sceneSelected)="onSceneSelected($event)"></app-scene-selector>
+      }
+      @case ('result') {
+        @if(finalImage(); as image) {
+            <app-result-display [imageUrl]="image" (startOver)="startOver()"></app-result-display>
+        }
+      }
+    }
+  </div>
+</main>

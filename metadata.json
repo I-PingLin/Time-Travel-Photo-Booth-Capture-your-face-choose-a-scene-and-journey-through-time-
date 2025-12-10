@@ -1,0 +1,7 @@
+{
+  "name": "Time-Travel Photo Booth",
+  "description": "Step back in time! Take a selfie and let our AI-powered photo booth place your face into iconic historical scenes. A fun and magical way to create unique photos.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
